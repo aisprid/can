@@ -3,13 +3,16 @@ package can
 import (
 	"io"
 	"net"
+	"sync"
+	"time"
 )
 
 // Bus represents the CAN bus.
 // Handlers can subscribe to receive frames.
 // Frame are sent using the *Publish* method.
 type Bus struct {
-	rwc ReadWriteCloser
+	rwc   ReadWriteCloser
+	mutex *sync.Mutex
 
 	handler []Handler
 }
@@ -33,6 +36,7 @@ func NewBusForInterfaceWithName(ifaceName string) (*Bus, error) {
 func NewBus(rwc ReadWriteCloser) *Bus {
 	return &Bus{
 		rwc:     rwc,
+		mutex:   &sync.Mutex{},
 		handler: make([]Handler, 0),
 	}
 }
@@ -79,6 +83,9 @@ func (b *Bus) Unsubscribe(handler Handler) {
 //
 // Frames publishes with the Publish methods are not received by handlers.
 func (b *Bus) Publish(frame Frame) error {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+	time.Sleep(500 * time.Microsecond)
 	return b.rwc.WriteFrame(frame)
 }
 
