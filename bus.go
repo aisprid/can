@@ -85,8 +85,9 @@ func (b *Bus) Unsubscribe(handler Handler) {
 func (b *Bus) Publish(frame Frame) error {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
-	time.Sleep(500 * time.Microsecond)
-	return b.rwc.WriteFrame(frame)
+	err := b.rwc.WriteFrame(frame)
+	time.Sleep(2 * time.Millisecond)
+	return err
 }
 
 func (b *Bus) contains(handler Handler) bool {
