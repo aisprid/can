@@ -4,7 +4,6 @@ import (
 	"io"
 	"net"
 	"sync"
-	"time"
 )
 
 // Bus represents the CAN bus.
@@ -49,8 +48,6 @@ func (b *Bus) ConnectAndPublish() error {
 			return err
 		}
 	}
-
-	return nil
 }
 
 // Disconnect stops handling CAN frames.
@@ -86,7 +83,6 @@ func (b *Bus) Publish(frame Frame) error {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 	err := b.rwc.WriteFrame(frame)
-	time.Sleep(2 * time.Millisecond)
 	return err
 }
 
